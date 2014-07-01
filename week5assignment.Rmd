@@ -1,0 +1,47 @@
+Brett Burk
+week 5 Assignment
+
+1. Appending is find if you just want to put a few lines (or if you want to add lines to an existing variable [df, vector, etc.]). It should also be noted that appending can be slow due to the way R manages memory.
+Data Frame Appending (which we can see is pretty laborious):
+```{r}
+egdfa <- data.frame(x = 0, y = 0, z = 0)
+newRow <- c(0,0,0)
+egdfa = rbind(egdfa, newRow)
+egdfa = rbind(egdfa, newRow)
+egdfa
+```
+Data Frame Preallocating:
+```{r}
+egdfp <- as.data.frame(matrix(0, nrow=3, ncol=3))
+names(egdfp) <- c('x', 'y', 'z')
+egdfp
+```
+Not only is this less cumbersome to type (especially for larger data sets) but it also executes much faster.
+List Appending:
+```{r}
+eglista <- list(as.numeric("1"), "2", "3")
+eglista <- c(eglista, "4")
+eglista
+```
+List Preallocating:
+```{r}
+eglistp <- vector(mode = "list", length = 10)
+eglistp
+```
+Vector Appending:
+```{r}
+egveca <- c("1", "2", "3")
+egveca <- c(egveca, "4")
+egveca
+```
+Vector Preallocating:
+```{r}
+egvecp <- vector(length = 10)
+egvecp
+```
+2.
+```{r}
+library('MASS')
+bostondf <- data.frame("Per Capita Crime" = Boston$crim, "Nitrogen Oxides PPM" = Boston$nox, "Property Tax per $10k" = Boston$tax)
+head(bostondf)
+```
