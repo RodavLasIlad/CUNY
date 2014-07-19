@@ -1,0 +1,40 @@
+---
+title: "Week 7 Linear Simplex"
+output: pdf_document
+---
+
+```{r}
+simplex <- function(mat1){
+ while(sum(mat1[nrow(mat1),]<0)>0){
+    pivotCol <- which.min(mat1[nrow(mat1),]) #this returns the index value of the smallest number in the last row
+    pivotRow <- which.min(sapply(1:(nrow(mat1)-1), function(i) mat1[i, ncol(mat1)]/(mat1[i, pivotCol]))) #chooses the row where the last row divided by the pivotcol has the lowest value
+    mat1[pivotRow,] <- (1/mat1[pivotRow, pivotCol]) * mat1[pivotRow,]
+    mat1 <- rbind(mat1[pivotRow,], t(sapply((1:nrow(mat1))[-pivotRow], function(i) mat1[i,] <- mat1[i,] - (mat1[i,pivotCol]*mat1[pivotRow,]))))
+  }
+  return(mat1[nrow(mat1),])
+}
+```
+Real world example:$$\\$$
+Let x be a pair of bike tires which sell for \$20, these take 1 hour to make, but 4 hours to sell$$\\$$
+Let y be bike frames which sell for \$300, these take 4 hours to make but 2 hours to sell$$\\$$
+Let z be bike seats which sell for \$20, these take half an hour to make but 8 hours to sell$$\\$$
+Let a be gears which sells for \$25 these take an hour to make and an hour to sell$$\\$$
+Let b be pedals which sell for \$5 these take half an hour to make and half an hour to sell.$$\\$$
+We already have a labor force, and we have a union agreement that the people who manufacture the bikes won't work more than 800 total hours (20 employees, 40 hours each).$$\\$$ We have a slightly more liberal sales union, so we can make them work 50 hours each (20 employees) or 1000 hours$$\\$$
+So we have$$\\$$
+$$1x + 4y + 0.5z+1a+0.5b \leq 800$$
+$$4x+2y+8z+1a+0.5b \leq 1000$$
+And we're trying to maximize
+$$20x+300y+20z+25a+5b$$
+So we then convert to a matrix that is (adding an extra column for slack variables)
+```{r}
+r1 <- c(1, 4, 0.5, 1, 0.5, 0, 800)
+r2 <- c(4, 2, 8, 1, 0.5, 0, 1000)
+maxRow <- c(-20, -300, -20, -25, -5, 1, 0)
+bikeMatrix <- rbind(r1, r2, maxRow)
+```
+If we now apply simplex:
+```{r}
+maximized <- simplex(bikeMatrix)
+```
+We can see that we should make 55 sets of tires, no bike frames, 17.5 bike frames, 50 gears, and 32.5 pedals--which will net us a profit of \$60,000. Not too shabby!
