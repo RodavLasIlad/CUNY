@@ -1,0 +1,80 @@
+---
+title: "week8RAssignment"
+output: html_document
+---
+
+Step 1:
+
+```{r}
+flips <- rbinom(n=100, prob=0.5, size=1)
+```
+
+Step 2:
+Assuming 0 is heads and 1 is tails
+
+```{r}
+
+sevenInARow = FALSE
+for (i in 1:93){
+  current <- flips[i:(i+6)]
+  if(any(0 != current) == FALSE ||  any(1 != current) == FALSE){
+    sevenInARow = TRUE
+  }
+}
+(sevenInARow)
+```
+
+Step 3:
+```{r}
+flipCounter <- function(count){
+  sevenInARowCount = 0
+  for(x in 1:count){
+    flips <- rbinom(n=100, prob=0.5, size=1)
+    sevenInARow = FALSE
+    for (i in 1:93){
+      current <- flips[i:(i+6)]
+      if(any(0 != current) == FALSE ||  any(1 != current) == FALSE){
+        sevenInARow = TRUE
+      }
+    }
+    if(sevenInARow == TRUE){
+      sevenInARowCount = sevenInARowCount + 1
+    }
+  }
+  return(sevenInARowCount/count)
+}
+```
+
+Step 4:
+```{r}
+flipCounter(10)
+flipCounter(100)
+flipCounter(1000)
+flipCounter(10000)
+
+system.time(flipCounter(1000))
+system.time(flipCounter(100000))
+```
+The estimate seems to slowly converge on 0.538. Fortunately, my machine has quite a bit of RAM (16gb) so it can handle R operations pretty well, 1000 loops executed in a few fractions of a second, but anything over that started to slow down. 100,000 took about 27 seconds to execute. (using system.time())
+
+Using R's rle():
+```{r}
+fastFlipper <- function(count){
+  sevenInARowCount <- 0
+  for(x in 1:count){
+    flips <- rbinom(n=100, prob=0.5, size=1)
+    if (any(rle(flips)$lengths >= 7)){
+      sevenInARowCount <- sevenInARowCount + 1
+    }
+  }
+    return(sevenInARowCount/count)
+}
+fastFlipper(10)
+fastFlipper(100)
+fastFlipper(1000)
+fastFlipper(10000)
+
+system.time(fastFlipper(1000))
+system.time(fastFlipper(100000))
+```
+Executing with the for loop, it took 27 seconds for 100,000, using rle, I can get the same results in less than 5 seconds.
