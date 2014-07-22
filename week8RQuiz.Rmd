@@ -1,0 +1,46 @@
+---
+title: "week8RQuiz"
+output: html_document
+---
+
+Adding the contents of two numeric vectors using a for loop:
+
+```{r}
+vec1 <- c(1, 2, 3, 4, 5)
+vec2 <- c(2, 3, 4, 5, 6)
+sumVec <- c(0,0,0,0,0)
+for (i in 1:length(vec1)){
+  sumVec[i] <- vec1[i] + vec2[i]
+}
+(sumVec)
+```
+The vectorized approach is much easier and efficient:
+```{r}
+sumVec2 <- vec1 + vec2
+(sumVec2)
+```
+
+While loop detecting heads:
+```{r}
+coinFlips <- c("heads","heads", "tails","heads")
+i <- 1
+while(coinFlips[i] == "heads"){
+  i = i+1
+}
+(i-1)
+```
+
+for loop from 1 to 100 adding only the odds (it feels really wrong to write it this way):
+```{r}
+runningSum <- 0
+for (i in 1:100){
+  if (!(i %% 2 == 0)){
+    runningSum = runningSum + i
+  }
+}
+(runningSum)
+```
+and an infinitely simpler solution (not using a loop):
+```{r}
+(sum(seq(1,100,2)))
+```
