@@ -1,0 +1,36 @@
+---
+title: "Untitled"
+output: pdf_document
+---
+
+
+```{r}
+library(RSQLite)
+setwd('C:/Users/Brett/Downloads')
+sqlite <- dbDriver("SQLite")
+workingdb <- dbConnect(sqlite, "cunyweek9.sqlite")
+dbListTables(workingdb)
+I <- dbSendQuery(workingdb, "SELECT * FROM I")
+Idf <- data.frame(fetch(I, -1))
+II <- dbSendQuery(workingdb, "SELECT * FROM II")
+IIdf <- data.frame(fetch(II, -1))
+III <- dbSendQuery(workingdb, "SELECT * FROM III")
+IIIdf <- data.frame(fetch(III, -1))
+IV <- dbSendQuery(workingdb, "SELECT * FROM IV")
+IVdf <- data.frame(fetch(IV, -1))
+dbDisconnect(workingdb)
+remove(sqlite)
+remove(workingdb)
+remove(I, II, III, IV)
+par(mfrow=c(2,2))
+plot(Idf, main="I")
+abline(lm(Idf$y ~ Idf$x))
+plot(IIdf, main="II")
+abline(lm(IIdf$y ~ IIdf$x))
+plot(IIIdf, main="III")
+abline(lm(IIIdf$y ~ IIIdf$x))
+plot(IVdf, main="IV")
+abline(lm(IVdf$y ~ IVdf$x))
+```
+
+We can see that all four have a very similar regression line, but obviously those regression lines don't tell us very much about II, III, or IV
