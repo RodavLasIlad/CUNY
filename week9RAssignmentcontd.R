@@ -44,3 +44,5 @@ plot(IIIlm)
 #IV
 IVlm <- lm(formula = y ~ x, data = IVdf)
 plot(IVlm)
+
+anova(Ilm)
