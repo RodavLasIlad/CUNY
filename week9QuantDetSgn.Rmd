@@ -1,0 +1,35 @@
+---
+title: "Week 9 Determinant and Sgn Functions"
+output: pdf_document
+---
+Knitr file of the sgn function and determinant: \newline
+Simple sgn function, returning 1 if an even number is passed and -1 if an odd is passed to it
+```{r}
+sgn <- function(n){
+  return((-1)^(n))
+}
+```
+
+Determinant function, first checks if the matrix has one column, in which case it returns the only entry (this seems easier than solving for a 2x2 at the end, etc.) as the determinant of a 1x1 matrix is that number. Then it finds the sum of all the determinant, utilizing the sgn function to decide whether they are +/-, multiplying the sgn times the current entry, and finally finding the determinant of whatever matrices are left. 
+```{r}
+determinant <- function(A){
+  if(ncol(A)==1){
+    return(A[1,1])
+  }else{
+    return(do.call(sum, lapply(1:ncol(A), function(i) sgn(i)*A[1,i] * determinant(A[-1,-i,drop=F]))))
+  }
+}
+```
+
+```{r}
+noninvert <- matrix(c(1,2,3,4,5,6,7,8,9), byrow=T, ncol=3)
+invert <- matrix(c(1,2,3,0,2,3,0,0,4), byrow=T, ncol=3)
+```
+A singular matrix:
+```{r}
+determinant(noninvert)
+```
+An uppert triangle matrix (to make demonstration easier):
+```{r}
+determinant(invert)
+```
