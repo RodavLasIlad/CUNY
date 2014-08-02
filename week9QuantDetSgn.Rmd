@@ -6,13 +6,14 @@ Knitr file of the sgn function and determinant: \newline
 Simple sgn function, returning 1 if an even number is passed and -1 if an odd is passed to it
 ```{r}
 sgn <- function(n){
-  return((-1)^(n))
+  return((-1)^(n+1))
 }
 ```
 
 Determinant function, first checks if the matrix has one column, in which case it returns the only entry (this seems easier than solving for a 2x2 at the end, etc.) as the determinant of a 1x1 matrix is that number. Then it finds the sum of all the determinant, utilizing the sgn function to decide whether they are +/-, multiplying the sgn times the current entry, and finally finding the determinant of whatever matrices are left. 
 ```{r}
 determinant <- function(A){
+  if(dim(A)[1] != dim(A)[2]) stop("Not a square matrix")
   if(ncol(A)==1){
     return(A[1,1])
   }else{
