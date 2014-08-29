@@ -1,0 +1,77 @@
+---
+output: pdf_document
+---
+\title{Week 1 Assignment--IS 605}
+\author{Brett Burk}
+\maketitle
+\noindent\textbf{1.1}: $$u=\begin{pmatrix}0.5\\0.5\end{pmatrix}$$, $$v=\begin{pmatrix}3\\-4\end{pmatrix}$$
+$$u \cdot v = 1.5-2=-0.5$$
+\noindent\textbf{1.2}: $$|u| = \sqrt{0.5^{2}+0.5^{2}}=\sqrt{0.5} \sim 0.7071$$
+$$|v| = \sqrt{3^{2}+(-4)^{2}}=\sqrt{25}=5$$
+\noindent\textbf{1.3}: $$3u-2v = 3 \begin{pmatrix}0.5\\0.5\end{pmatrix} - 2 \begin{pmatrix}3\\-4\end{pmatrix}=\begin{pmatrix}1.5\\1.5\end{pmatrix}-\begin{pmatrix}6\\-8\end{pmatrix}=\begin{pmatrix}-4.5\\9.5\end{pmatrix}$$
+\noindent\textbf{1.4}$$\cos \theta = \frac{u \cdot v}{|u||v|}=\frac{-0.5}{5\sqrt{5}}\sim -0.0447$$
+
+\noindent\textbf{2}
+```{r}
+m <- matrix(c(1,1,3,2,-1,5,-1,-2,4), ncol=3, byrow=T)
+m
+v <- matrix(c(1,2,6), ncol=1)
+v
+solver <- function(m, v){
+  #I originally considered a vectorized approach, but this one is much more readable, and considering the matrix is defined as 3x3 and solvable, a vectorized approach is unnecessary
+  m1 <- cbind(m, v)
+  swap12 <- F
+  swap13 <- F
+  swap23 <- F
+  #First let's start with a row that has a non-zero first entry
+  if(m1[1,1] == 0){
+    if(m1[2,1]==0){
+      temp <- m1[1,]
+      m1[1,] <- m1[3,]
+      m1[3,] <- temp
+      swap13 <- T #Rows 1 & 3 are swapped
+    }
+    temp <- m1[1,]
+    m1[1,] <- m1[2,]
+    m1[2,] <- temp
+    swap12 <- T #Rows 2 & 3 are swapped
+  }
+  #Using RREF to solve for the three variables:
+  m1[1,] <- m1[1,]/m[1,1]
+  m1[2,] <- m1[2,] - (m1[2,1] * m1[1,])
+  #Making sure that m1[2,2] is non-zero after multiples of the first row are removed
+  if(m1[2,2] == 0){
+    temp <- m1[2,]
+    m1[2,] <- m1[3,]
+    m1[3,] <- temp
+    m1[2,] <- m1[2,] - (m1[2,1] * m1[1,])
+    swap23 <- T #Rows 2 & 3 are swapped
+  }
+  m1[2,] <- m1[2,]/m1[2,2]
+  m1[3,] <- m1[3,] - (m1[3,1] * m1[1,])
+  m1[3,] <- m1[3,] - (m1[3,2] * m1[2,])
+  m1[3,] <- m1[3,]/m1[3,3]
+  #Now it's upper triangular
+  m1[1,] <- m1[1,] - (m1[1,2] * m1[2,])
+  m1[1,] <- m1[1,] - (m1[1,3] * m1[3,])
+  m1[2,] <- m1[2,] - (m1[2,3] * m1[3,])
+  #Now in RREF
+  if(swap23 == T){ #Checking for row swaps in order to produce x_1, x_2, and x_3 in the correct order
+    temp <- m1[2,]
+    m1[2,] <- m1[3,]
+    m1[3,] <- temp
+  }
+  if(swap12 == T){
+    temp <- m1[12,]
+    m1[1,] <- m1[2,]
+    m1[2,] <- temp
+  }
+  if(swap13 == T){
+    temp <- m1[1,]
+    m1[1,] <- m1[3,]
+    m1[3,] <- temp
+  }
+  return(c(m1[1,4], m1[2,4], m1[3,4]))
+}
+solver(m,v)
+```
