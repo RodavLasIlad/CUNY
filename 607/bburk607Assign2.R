@@ -1,26 +1,26 @@
 ##### Question 1.a #####
-queue <- c("James", "Mary", "Steve", "Alex", "Patricia")
+(queue <- c("James", "Mary", "Steve", "Alex", "Patricia"))
 
 ##### Question 1.b #####
-queue <- c(queue, "Harold")
+(queue <- c(queue, "Harold"))
 
 ##### Question 1.c #####
-queue <- queue[2:length(queue)]
+(queue <- queue[2:length(queue)])
 
 ##### Question 1.d ##### (Making it nearly as complicated as possible)
-queue[c(1:(which(queue == "Steve")-1), which(queue == "Patricia"), (which(queue == "Steve"):length(queue))[-((length(queue) - which(queue == "Steve")))])]
+(queue[c(1:(which(queue == "Steve")-1), which(queue == "Patricia"), (which(queue == "Steve"):length(queue))[-((length(queue) - which(queue == "Steve")))])])
 
 ##### Question 1.e #####
-queue <- subset(queue, queue != "Harold")
+(queue <- subset(queue, queue != "Harold"))
 
 ##### Question 1.f #####
-queue <- subset(queue, queue != "Alex")
+(queue <- subset(queue, queue != "Alex"))
 
 ##### Question 1.g #####
 which(queue == "Patricia")
 
 ##### Question 1.h #####
-length(queue)
+(length(queue))
 
 ##### Question 2   #####
 quadratic <- function(a,b,c){
@@ -38,6 +38,7 @@ quadratic <- function(a,b,c){
   }
   return(c(pos, neg))
 }
+quadratic(1,1,1)
 
 ##### Question 3   #####
 one.to.onek <- c(1:1000)
@@ -52,3 +53,4 @@ pythag.trip <- function(a, b, c){
     return(F)
   }
 }
+pythag.trip(3,4,5)
