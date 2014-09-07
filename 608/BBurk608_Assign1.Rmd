@@ -5,6 +5,7 @@ output: pdf_document
 \author{Brett Burk}
 \maketitle
 ```{r, fig.height=8}
+options(warn=-1)
 ##### Loading in the data #####
 
 library(ggplot2)
