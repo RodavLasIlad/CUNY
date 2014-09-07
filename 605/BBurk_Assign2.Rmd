@@ -1,0 +1,50 @@
+---
+output: pdf_document
+---
+\title{Week 2 Assignment--IS 605}
+\author{Brett Burk}
+\maketitle
+\noindent\textbf{1.1}: This is incredibly obvious if A is not a square matrix, but is instead an $m \times n$ matrix. $AA^{T}$ would be an $m \times m$ sized matrix, and $A^{T}A$ would be an $n \times n$ sized matrix, so they would not necessarily be equal.$$\\$$
+\noindent\textbf{1.2}A square matrix $A$ that satisfies $A^{t}A=AA^{T}$ is called a normal matrix.
+We can see what the requirements are by taking a simple $2 \times 2$ matrix:
+$$A=\begin{pmatrix}a&b\\c&d\end{pmatrix}$$
+$$AA^{T} = \begin{pmatrix}a&b\\c&d\end{pmatrix}\begin{pmatrix}a&c\\b&d\end{pmatrix}= \begin{pmatrix}a^{2}+b^{2} & ac+bd \\ ac+bd & c^{2}+d^{2}\end{pmatrix}$$
+$$A^{T}A = \begin{pmatrix}a&c\\b&d\end{pmatrix}\begin{pmatrix}a&b\\c&d\end{pmatrix}=\begin{pmatrix}a^{2} + c^{2}&ab+cd \\ ab+cd & c^{2}+d^{2}\end{pmatrix}$$
+Thus, for the equations to be equal $b^{2}=c^{2}$ thus $b= \pm c$\\. This will of course always be true for diagonal matrices (and scales to larger matrices). This is true because in a transpose, the diagonal remains the same. Therefore in a diagonal matrix $A^T=A$. Thus the original equation can be rewritten as $AA=AA$ which is inherently true. Thus a diagonal matrix, such as the identity, it will always hold that $A^TA=AA^T$$$\\$$
+\noindent\textbf{2}
+A vectorized approach may be preferred if dealing with large enough data sets, but here I assumed that matrices would be on the smaller side (and this lends readability to the code)
+
+```{r}
+##### LU Decomposition #####
+LU.Decomp <- function(A){
+  if(dim(A)[1] != dim(A)[2]){
+    stop("Matrix must be square to go through LU decomposition")
+  }
+  L <- diag(nrow(A)) # Generates the lower
+  for (i in 2:nrow(A)){ # Rows, starting from 2
+    for (j in 1:(i-1)){ # Columns, going through all but the last
+      if (A[i,j] == 0){
+        stop("0 element found in pivot position, LU cannot be performed")
+      }
+      L[i,j] <- (A[i,j]/A[j,j]) # First modifying L
+      A[i,] <- A[i,] - ((A[i,j]/A[j,j]) * A[j,]) #  Then treating A as U
+
+    }
+  }
+  print("Lower:")
+  print(L)
+  print("Upper:")
+  print(A)
+}
+
+m <- matrix(c(1,2,1,-2,-3,1,3,5,0), byrow=T, nrow=3)
+LU.Decomp(m)
+m2 <- matrix(c(1,4,-3,-2,8,5,3,4,7), byrow=T, nrow=3)
+LU.Decomp(m2)
+##Will throw an error because LU decomp cannot be performed (although LUP is possible):
+#m3 <- matrix(c(1:16), byrow=T, nrow=4)
+#LU.Decomp(m3)
+##Will throw an error for not being square:
+# m4 <- matrix(c(1:8), byrow=T, nrow=2)
+# LU.Decomp(m4)
+```
