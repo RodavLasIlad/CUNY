@@ -1,0 +1,55 @@
+---
+output: pdf_document
+---
+\title{First Assignment--IS 608}
+\author{Brett Burk}
+\maketitle
+```{r, fig.height=8}
+##### Loading in the data #####
+
+library(ggplot2)
+setwd("C:\\Users\\Brett\\Dropbox\\CUNY\\608")
+df <- read.csv("inc5000_data.csv")
+###### Plot 1 #####
+df$State <- factor(df$State, levels=rev(levels(df$State)))
+ggplot(df, aes(factor(State))) + 
+  geom_histogram() + 
+  xlab("State") + 
+  ylab("Total Companies Per State") + 
+  ggtitle("5,000 Fastest Growing Companies in the US") + coord_flip()
+```
+We can, at a glance, see that California has the most 'fast growing' companies, with Texas and New York following.
+```{r}
+ny <-subset(df[complete.cases(df),], State=='NY')
+##### Detects the outliers #####
+is.outlier<-with(ny, ave(Employees, Industry, FUN=function(x) {
+  st<-boxplot.stats(x)$stats
+  x < st[1] | x > st[5]
+}))
+##### Removes the outliers #####
+ny <- ny[!is.outlier, ]
+##### Plot 2 #####
+ggplot(ny, aes(x=factor(Industry), y=Employees)) + 
+  geom_boxplot(outlier.size=0) + # As it would be nearly impossible to constantly remove all outliers, I've made the few that were generated in the new set invisible
+  ylim(0, 950) + # Scaled it down after removing outliers
+  xlab("Industry") + 
+  ggtitle("Employees in NY by Industry") + 
+  coord_flip() # Setting it on the same axis as the original
+```
+We can see that Travel and Hospitality dominates (after outliers have been removed), but that the range is pretty variable (and that most of the companies employee less than a hundred people, so it is mainly the few large companies driving the count up)
+We can also see that Environmental Services is pretty well spread out (most companies have a sizable chunk and that the middle quartile is the highest).
+
+```{r}
+nyr <-subset(df[complete.cases(df),], State=='NY')
+nyr$profit.per.employee <- nyr$Revenue / nyr$Employees
+ggplot(nyr, aes(x=factor(Industry), y=profit.per.employee)) + 
+  geom_boxplot(outlier.size=0) + 
+  ylim(0,1000000) +
+  xlab("Industry") +
+  ylab("Profit per Employee") +
+  ggtitle("Total Profit as a Function of Number of Employees") +
+  coord_flip()
+```
+
+So we can see that While most Human Resource companies are not making a lot of money per employee, there are some that are very profitable per employee.
+Travel and hospitality, which employs a lot of people per company (as we saw from the last chart) does not necessarily make a lot of profit per employee (but with a sizable enough company, you're going to make a good profit). Consumer Products and services is another industry that is pushed up by the extremes. Some, such as Computer Hardware, are too small a group to make many assumptions about.
