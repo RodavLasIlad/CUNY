@@ -91,7 +91,7 @@ merged.ss2.clean
 
 ##### Question 11 #####
 not.nchar <- function(char.vector){
-  sapply(strsplit(char.vector, ""), length)
+  return(sapply(strsplit(char.vector, ""), length))
 }
 not.nchar(c("hello", "goodbye", "hello again"))
 

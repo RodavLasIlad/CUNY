@@ -1,4 +1,5 @@
 ##### Question 1 #####
+
 Count.NAs <- function(v){
   return (sum(is.na(v)))
 }
@@ -6,6 +7,7 @@ test.v <- c(1:10, NA, NA, 11, NA)
 Count.NAs(test.v)
 
 ##### Question 2 #####
+
 Count.NAs.df <- function(df){
   na.vec <- vector()
   for (i in 1:ncol(df)){
@@ -21,6 +23,7 @@ test.df[1,1] <- NA
 Count.NAs.df(test.df)
 
 ##### Question 3 #####
+
 Get.Stats <- function(v){
   #### Min and max ####
   v.min <- v[1]
@@ -32,13 +35,9 @@ Get.Stats <- function(v){
       v.min <- v[i]
     }
   }
-  print("Min/Max")
-  print(v.min)
-  print(v.max)
+  
   #### Mean ####
   v.mean <- sum(v)/length(v)
-  print("Mean")
-  print(v.mean)
   
   #### Median #### with my own sort (since we're not supposed to use built-ins)
   swap <- T
@@ -54,8 +53,6 @@ Get.Stats <- function(v){
     }
   }
   v.median <- Get.Median(v)
-  print("Median")
-  print(v.median)
   
   #### Quartiles #####
   half <- length(v)/2
@@ -66,23 +63,16 @@ Get.Stats <- function(v){
     v.firstquart <- Get.Median(v[c(1:(half - 0.5))])
     v.thirdquart <- Get.Median(v[c((half + 0.5):length(v))])
   }
-  print("Quarts")
-  print(v.firstquart)
-  print(v.thirdquart)
   
   #### Standard Deviation ####
   v.var <- sum((v.mean-v)^2)
   v.sd <- sqrt(v.var)
-  print("SD")
-  print(v.sd)
   
   #### Count NAs ####
   v.nas <- Count.NAs(v)
-  print("NAs")
-  print(v.nas)
   
   #### Output ####
-  sum.stats <- c(v.min, v.max, v.mean, v.firstquart, v.median, v.thirdquart, v.sd, v.nas)
+  sum.stats <- list(v.min, v.max, v.mean, v.firstquart, v.median, v.thirdquart, v.sd, v.nas)
   names(sum.stats) <- c("Min", "Max", "Mean", "1st.Quartile", "2nd.Quartile.aka.Median", "3rd.Quartile", "Standard.Deviation", "NAs")
   return(sum.stats)
 }
@@ -101,14 +91,30 @@ a <- c(5,8,4,4,6,3,8)
 Get.Stats(a)
 
 ##### Question 4 #####
+
 Vec.Info <- function(v){
   v.distinct <- length(unique(v))
   v.most.common.count <- max(table(v))
-  v.most.common <- c(names(subset(table(v), table(v) == v.most.common.count)))
+  v.most.common <- paste(names(subset(table(v), table(v) == v.most.common.count)), sep = ", ")
   v.missing.count <- Count.NAs(v)
-  info <- c(v.distinct, v.most.common, v.most.common.count, v.missing.count)
+  info <- list(v.distinct, v.most.common, v.most.common.count, v.missing.count)
   names(info) <- c("Distinct.Elements", "Most.Common", "Most.Common.Count", "NAs")
   return(info)
 }
-test <- c("Hi", "Bye", "See ya", "Later", "Hi", "Sup", "Howzit", NA)
+test <- factor(c("Hi", "Bye", "See ya", "Later", "Hi", "Sup", "Bye", "Howzit", NA))
 test2 <- Vec.Info(test)
+
+##### Question 5 #####
+
+Logical.Info <- function(v){
+  v.nas <- Count.NAs(v)
+  v <- v[complete.cases(v)]
+  # Assuming for the rest that the portions are only for valid values
+  v.true <- sum(v)
+  v.false <- length(v) - v.true
+  v.prop.true <- v.true / length(v)
+  info <- list(v.true, v.false, v.prop.true, v.nas)
+  names(info) <- c("True", "False", "Proportion.of.True", "NAs")
+}
+
+##### Question 6 #####
