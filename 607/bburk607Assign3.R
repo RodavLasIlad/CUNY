@@ -24,7 +24,7 @@ Count.NAs.df(test.df)
 
 ##### Question 3 #####
 
-Get.Stats <- function(v){
+Num.Info <- function(v){
   #### Min and max ####
   v.min <- v[1]
   v.max <- v[1]
@@ -87,22 +87,22 @@ Get.Median <- function(v){
   }
   return (v.median)
 }
-a <- c(5,8,4,4,6,3,8)
-Get.Stats(a)
+num.v <- c(5,8,4,4,6,3,8,1,5)
+Num.Info(num.v)
 
 ##### Question 4 #####
 
-Vec.Info <- function(v){
+Char.Factor.Info <- function(v){
   v.distinct <- length(unique(v))
   v.most.common.count <- max(table(v))
   v.most.common <- paste(names(subset(table(v), table(v) == v.most.common.count)), sep = ", ")
   v.missing.count <- Count.NAs(v)
   info <- list(v.distinct, v.most.common, v.most.common.count, v.missing.count)
   names(info) <- c("Distinct.Elements", "Most.Common", "Most.Common.Count", "NAs")
-  return(info)
+  return (info)
 }
-test <- factor(c("Hi", "Bye", "See ya", "Later", "Hi", "Sup", "Bye", "Howzit", NA))
-test2 <- Vec.Info(test)
+factor.v <- factor(c("Hi", "Bye", "See ya", "Later", "Hi", "Sup", "Bye", "Howzit", NA))
+Char.Factor.Info(factor.v)
 
 ##### Question 5 #####
 
@@ -115,6 +115,27 @@ Logical.Info <- function(v){
   v.prop.true <- v.true / length(v)
   info <- list(v.true, v.false, v.prop.true, v.nas)
   names(info) <- c("True", "False", "Proportion.of.True", "NAs")
+  return (info)
 }
+bool.v <- c(TRUE, FALSE, TRUE, TRUE, NA, FALSE, NA, TRUE, FALSE)
+Logical.Info(bool.v)
 
 ##### Question 6 #####
+function.of.functions <- function(df){
+  list.of.lists <- list()
+  for (column in 1:ncol(df)){
+    if (class(df[,column]) == "logical"){
+      list.of.lists[[length(list.of.lists)+1]] <- append(list.of.lists, Logical.Info(df[,column]))
+    }
+    else if (class(df[,column]) == "factor" | class(df[,column]) == "character"){
+      list.of.lists[[length(list.of.lists)+1]] <- append(list.of.lists, Char.Factor.Info(df[,column]))
+    }
+    else{
+      list.of.lists[[length(list.of.lists)+1]] <- append(list.of.lists, Num.Info(df[,column]))
+    }
+  }
+  return(list.of.lists)
+}
+
+df.test <- data.frame(bool.v, num.v, factor.v)
+function.of.functions(df.test)
