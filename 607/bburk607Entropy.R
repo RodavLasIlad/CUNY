@@ -30,9 +30,7 @@ library(plyr)
 decide <- function(df, col){
   ig <- sapply((1:ncol(df))[-col], function(x) infogain(df[,col], df[,x]))
   names(ig) <- names(df[-col])
-  igl <- list(unname(which.max(ig)), ig)
-  names(igl) <- c("max", "gains")
-  return(igl)
+  return(ig)
 }
 
 decide(dataset, 4)
