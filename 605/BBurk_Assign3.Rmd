@@ -1,0 +1,73 @@
+---
+output: pdf_document
+---
+
+\title{Week 3 Assignment--IS 605}
+\author{Brett Burk}
+\maketitle
+\noindent\textbf{1.1}The rank of matrix $A$ is 4, as it has 4 linearly independent rows (none is multiple of another, nor a linear combination of others, nor are there any rows of zeroes). We can also see that when put into RREF, we have a $4 \times 4$ identity, which is four linearly independent rows. 
+
+```{r, include=FALSE}
+library(pracma)
+library(Matrix)
+```
+
+```{r}
+##### Problem Set 1 #####
+##### Question 1 #####
+m <- matrix(c(1,2,3,4,
+              -1,0,1,3,
+              0,1,-2,1,
+              5,4,-2,-3), nrow=4, byrow=T)
+
+rankMatrix(m)[1]
+rref(m)
+```
+
+\noindent\textbf{1.2} The maximum rank is $n$ because there can be no more than $n$ linearly independent rows. The minimum rank, assuming it's nonzero is 1 (as only a zero matrix can have no linearly independent rows, all nonzero matrices have a minimum rank of one).
+
+\noindent\textbf{1.3} The rank of $B$ is 1, as rows two and three are just multiples of row one (we can also see that the same is true of the columns). $R_2=3R_1$ and $R_3=2R_1$. Since they are multiples of only one row, the rank is one.
+
+```{r}
+##### Question 3 #####
+m2 <- matrix(c(1,2,1,
+               3,6,3,
+               2,4,2), byrow=T, nrow=3)
+rankMatrix(m2)[1]
+rref(m2)
+```
+
+
+\noindent\textbf{2} The eigenvalues are $1, 6, 4$. Since the matrix is in upper triangular, the eigenvalues are simply the diagonal. They can also be computed by finding $Av = \lambda v$ which is $(A - \lambda I)v = 0$ We can then find a matrix where $A - \lambda I$ determinant is equal to zero (and is a nonzero matrix).
+Thus we have $$det \left( \begin{pmatrix}1&2&3\\0&4&5 \\ 0&0&6 \end{pmatrix} - \begin{pmatrix}\lambda&0&0\\0&\lambda&0\\0&0&\lambda\end{pmatrix}\right)=det\begin{pmatrix}1 - \lambda&2&3\\0&4 - \lambda&5 \\ 0&0&6 - \lambda \end{pmatrix}$$
+$$ (1 - \lambda)[(4-\lambda)(6-\lambda)-(5)(0)]-2[(0)(6-\lambda)-(5)(0)]-3[(0)(0) - (4 - \lambda)(0)]=0
+$$ Which gives us $6,4,1$
+Now we find $AX=0$
+First lets solve for $6$:
+$$\begin{pmatrix}1 - \lambda&2&3\\0&4 - \lambda&5 \\ 0&0&6 - \lambda \end{pmatrix}$$ where $\lambda = 6$
+$$\begin{pmatrix}1 - 6&2&3\\0&4-6&5 \\ 0&0&6-6 \end{pmatrix}=\begin{pmatrix}-5&2&3\\0&-2&5 \\ 0&0&0 \end{pmatrix}$$
+Now to solve for the eigenvector:
+$$\begin{pmatrix}-5&2&3\\0&-2&5 \\ 0&0&0 \end{pmatrix}\begin{pmatrix}v_1\\v_2\\v_3\end{pmatrix}=\begin{pmatrix}0\\0\\0\end{pmatrix}$$
+$$-5v_1 + 2v_2 +3v_3=0$$
+$$0v_1 - 2v_2 + 5v_3 = 0$$
+$$0v_1 + 0v_2 + 0v_3 = 0$$
+Thus we have $$2v_2 = 5v_3 \sim v_2 =\frac{5}{2}v_3$$
+and then $$ -5v_1 + 2(\frac{5}{2}v_3) +3v_3 = -5v_1+8v_3 \sim v_1 = \frac{8}{5} v_3 $$
+Thus our first Eigenvector is equivalent to $$\begin{pmatrix}\frac{8}{5}&\frac{5}{2}&1\end{pmatrix}$$ 
+If we perform the same process with our next eigenvalue, 4, we get
+$$\begin{pmatrix}-3&2&3\\0&0&5\\0&0&2\end{pmatrix}$$ which gives us an eigenvector of $$\begin{pmatrix}\frac{2}{3} & 1 & 0\end{pmatrix}$$ (again, acknowledging any other vector that is multiplied by a scalar is equivalent)
+Finally we can solve for $1$:
+$$\begin{pmatrix}0&2&3\\0&3&5\\0&0&5\end{pmatrix}$$ which has the eigenvector of $$\begin{pmatrix}1&0&0\end{pmatrix}$$
+```{r}
+##### Problem Set 2 #####
+A <- matrix(c(1,2,3,0,4,5,0,0,6), byrow=T, nrow=3)
+# Because this matrix is in upper triangular form, the eigenvalues are simply the diagonals: 6, 4, 1
+eigen(A)$values
+eigen(A)$vectors
+```
+Showing that the ratios in R are the same as the ones I found:
+```{r}
+eigen(A)$vectors[1,1] / eigen(A)$vectors[3,1]
+eigen(A)$vectors[2,1] / eigen(A)$vectors[3,1]
+eigen(A)$vectors[1,2] / eigen(A)$vectors[2,2]
+```
