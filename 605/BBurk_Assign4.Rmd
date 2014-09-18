@@ -1,0 +1,96 @@
+---
+output: pdf_document
+---
+\title{Week 4 Assignment--IS 605}
+\author{Brett Burk}
+\maketitle
+\noindent\textbf{1}
+First, I create the matrix
+```{r}
+A <- matrix(c(1,2,3,
+              -1,0,4), byrow=T, ncol=3)
+```
+Finding $X=AA^{T}$
+```{r}
+X <- A %*% t(A)
+X
+```
+Finding $Y=A^{T}A$
+```{r}
+Y <- t(A) %*% A
+Y
+```
+Getting the eigenvalues/vectors for $X$
+```{r}
+eigen(X)$values
+eigen(X)$vectors
+```
+Getting the eigenvalues/vectors for $Y$
+```{r}
+eigen(Y)$values
+eigen(Y)$vectors
+```
+Getting the SVD of $A$. $$\\$$
+Singular values:
+```{r}
+svd(A)$d
+```
+Left singular:
+```{r}
+svd(A)$u
+```
+Right singular:
+```{r}
+svd(A)$v
+```
+Showing that they are equal in relation--but R chose to reverse the signs on some of them
+```{r}
+all.equal(svd(A)$v[,1], (-1 * eigen(Y)$vectors[,1]))
+all.equal(svd(A)$v[,2], eigen(Y)$vectors[,2])
+all.equal(svd(A)$u[,1], (-1 * eigen(X)$vectors[,1]))
+all.equal(svd(A)$u[,2], eigen(X)$vectors[,2])
+```
+X and Y eigens are equal (removing the near zero value from Y)
+```{r}
+all.equal(eigen(X)$values, eigen(Y)$values[c(1,2)])
+```
+\noindent\textbf{2}
+Checks whether the matrix is invertible, and if it is, it calculates the conjugate (removing the rows and columns, and finding the determinant of that) also uses the sgn function which is $(-1)^{i+j}$
+```{r}
+myinverse <- function(m){
+  # Ridiculous to not just be able to return this, but if F, instead of returning False, it returns 
+  # the distance--so I have to hardcode the == T
+  if (all.equal(det(m),0) == T){
+    print("Matrix is not invertible")
+    # Commented out so I can use knitr
+    # stop("Matrix is not invertible")
+  }
+  c <- matrix(ncol=ncol(m), nrow=nrow(m))
+  for (i in 1:nrow(m)){
+    for (j in 1:ncol(m)){
+      c[i,j] <- (-1)^(i+j) * det(m[-i,-j])
+    }
+  }
+ return (t(c)/det(m))
+}
+```
+Now a test (first with an invertible matrix)
+```{r}
+A <- matrix(c(1,3,4,
+              0,5,6,
+              0,0,7), nrow=3, byrow=T)
+B <- myinverse(A)
+B
+```
+Now to test it (first by checking AB=I, then checking against R's built in inversion function:
+
+```{r}
+I <- diag(3)
+all.equal(A %*% B, diag(3))
+all.equal(B, solve(A))
+```
+And a final test with a non-invertible (aka singular) matrix (which I have commented out so that I can knit):
+```{r}
+m2 <- matrix(c(1:9), nrow=3, byrow=T)
+myinverse(m2)
+```

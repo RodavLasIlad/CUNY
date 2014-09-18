@@ -1,0 +1,56 @@
+---
+title: "Best popular movies"
+output: pdf_document
+---
+
+
+```{r, echo=FALSE}
+library(ggplot2)
+library(grid)
+library(gridExtra)
+library(plyr)
+```
+
+Here I loaded in the data (which is already built in)
+```{r}
+setwd("C:\\Users\\Brett\\Dropbox\\CUNY\\607")
+m <- read.table("movies.tab", sep="\t", header=TRUE, quote="", comment="")
+```
+Popular movies can be easily defined by those that received the most votes. Thus it should be a function of rating and votes.
+
+```{r}
+popular <- ddply(m, "year", summarise, popularity=votes)
+most.popular.year <- popular[which.max(popular$popularity),1]
+most.popular.year
+```
+Best is less narrowly defined--likely factors can be rating--but we can also consider how many r10 ratings wer received (and the density around r10). 
+Best can also be defined from the studios perspective by the budget being low, and the rating and votes being high (but for these examples, we'll ignore that).
+
+Calculating by determining the popularity by multiplying the rating by the votes -- this is a simple measurement, as years that had lots of viewers will obviously be preferenced--even if they weren't as good:
+
+```{r}
+best1 <- ddply(m, "year", summarise, bestness=rating * votes)
+ggplot(data=best1, aes(x=year, y=bestness)) + geom_point() + geom_point(aes(x=year[which.max(bestness)], y=bestness[which.max(bestness)]), col="Red")
+best.year1 <- best1[which.max(best1$bestness),1]
+best.year1
+```
+
+Calculating by using the mean of r10--movies which received the highest percentile of votes in the top 10%:
+
+```{r}
+best2 <- ddply(m, "year", summarise, bestness = mean(r10))
+ggplot(data=best2, aes(x=year, y=bestness)) + geom_point() + geom_point(aes(x=year[which.max(bestness)], y=bestness[which.max(bestness)]), col="Red") + geom_smooth()
+best.year2 <- best2[which.max(best2$bestness),1]
+best.year2
+```
+Trying to find which year had the best most popular movies by multiplying the r10 (as a percent) times the amount of votes. This should tell us which movies had the most people giving it a rating in the top ten percent
+```{r}
+best.most.popular <- ddply(m, "year", summarise, best.pop = (mean(r10)/10) * votes)
+ggplot(data=best.most.popular, aes(x=year, y=best.pop)) + geom_point() + geom_point(aes(x=year[which.max(best.pop)], y=best.pop[which.max(best.pop)]), col="Red") +           ggtitle("Best popular movies by year") +
+ylab("R10 * Votes") +
+  xlab("Year")
+best.most.popular.year <- best.most.popular[which.max(best.most.popular$best.pop), 1]
+best.most.popular.year
+```
+
+Thus we have determined that 2001 is the year that the best popular movies were made.
