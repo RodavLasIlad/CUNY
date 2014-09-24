@@ -1,0 +1,73 @@
+---
+output: pdf_document
+---
+\vspace*{\stretch{1.0}}
+   \begin{center}
+      \Large\textbf{Week 5 Assignment--IS 607}\\
+      \large\textit{Brett Burk}
+   \end{center}
+   \vspace*{\stretch{2.0}}
+\noindent 1. Questions:
+i. How many total votes were there? \newline
+ii. What percent voted yes? \newline
+iii. Are the young more likely to vote yes? \newline
+\newline
+2.
+```{r include=FALSE}
+library(tidyr)
+library(dplyr)
+```
+
+```{r}
+messy <- data.frame(yes.no = c("yes", "no"), 
+                    "ed.sixteen.twentyfour" = c(80100, 35900), 
+                    "ed.twentyfive" = c(143000, 214800), 
+                    "gl.sixteen.twentyfour" = c(99400, 43000), 
+                    "gl.twentyfive" = c(150400, 207000))
+messy
+```
+3.
+```{r}
+tidier <- messy %>%
+  gather(group, votes, -yes.no) %>%
+  arrange(yes.no)
+tidier
+```
+4.i.
+```{r}
+total.votes <- select(tidier, votes) %>%
+  sum()
+total.votes
+```
+4.ii.
+```{r}
+percent.yes <-  filter(tidier, yes.no=="yes") %>%
+  select(votes) %>%
+  sum() %>%
+  function(x) (x/total.votes) * 100
+percent.yes
+```
+4.iii.
+```{r}
+# This could be vectorised, but for such a small sample, it seems pointless to not just copy and paste
+young.votes <- filter(tidier, grepl("*sixteen.twentyfour", tidier$group))
+young.total.votes <- select(young.votes, votes) %>%
+  sum()
+young.percent.yes <-  filter(young.votes, yes.no=="yes") %>%
+  select(votes) %>%
+  sum() %>%
+  function(x) (x/young.total.votes) * 100
+young.percent.yes
+
+old.votes <- filter(tidier, grepl("*twentyfive", tidier$group))
+old.total.votes <- select(old.votes, votes) %>%
+  sum()
+old.percent.yes <-  filter(old.votes, yes.no=="yes") %>%
+  select(votes) %>%
+  sum() %>%
+  function(x) (x/old.total.votes) * 100
+old.percent.yes
+```
+It seems that the young are more likely to prefer Cullen Skink \newline
+\newline
+5. This was a pretty efficient way to handle it, except for the last question, but I'm not sure how changing the table width/length would have much effected this (I love being able to pipe the data!). I love being able to write in plain english as well, it's much more natural using these packages.
