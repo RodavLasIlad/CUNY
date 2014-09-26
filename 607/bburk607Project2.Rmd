@@ -1,0 +1,189 @@
+---
+output: pdf_document
+---
+\begin{center}
+  \Large\textbf{Project 2--IS 607}\\
+  \large\textit{Brett Burk}
+\end{center}
+\noindent 1. The data set I have chosen is that of the Lending Club's data for the first six months of this year. I chose this mostly because it's 
+publicly accessible and contains all of the requirements for the assignment--I found several other data sets more interesting, but unfortunately they 
+did not contain all of the types of columns, or did not have 1000 or more observations. \newline
+```{r, include=FALSE}
+### Libraries
+library(dplyr)
+library(ggplot2)
+library(scales)
+library(plyr)
+```
+
+```{r}
+##### Reading in the data:
+data <- read.csv("C:\\Users\\Brett\\Documents\\Data\\LoanStats3c.csv", header=T)
+# choosing only a few of the 96 columns
+data <- select(data, id, addr_state, annual_inc, emp_length, grade,
+               home_ownership, loan_amnt, loan_status)
+# reordering emp_length (so 10+ doesn't fall after 1):
+data$emp_length <-factor((data$emp_length), c("< 1 year", "1 year", "2 years", 
+                                              "3 years", "4 years", "5 years", 
+                                              "6 years", "7 years", "8 years", 
+                                              "9 years", "10+ years", "n/a", ""))
+```
+After playing with the data a bit, I realized that the values after row 102505 are all incomplete, probably because the loans were not granted (they
+seem to be requested to close to the making of the csv file to have been accepted), thus they are not relevant for my work, so I'm removing them
+```{r}
+data <- data[1:102505,]
+```
+Setting the empty values and those with the string n/a to NA (as R deals with NA easier)--the data dictionary says those that are unemployed are labeled as < 1 year, so I'm sure the blanks are just because the information was not entered.
+```{r}
+data$emp_length[data$emp_length == ""] <- NA
+data$emp_length[data$emp_length == "n/a"] <- NA
+```
+Setting empty grade levels to NA
+```{r}
+data$grade[data$grade == ""] <- NA
+```
+Setting empty Home Ownership values to NA
+```{r}
+data$home_ownership[data$home_ownership == ""] <- NA
+```
+2.
+States:
+```{r, fig.height=8}
+data$addr_state <- factor(data$addr_state, levels=rev(levels(data$addr_state)))
+ggplot(data, aes(addr_state)) + 
+  geom_histogram() + 
+  coord_flip() + 
+  ylab("Loans count") + 
+  xlab("State") + 
+  ggtitle("Total loans per state")
+```
+We can see that most of the loans are placed in California, with New York and Texas being second and third place\newline
+Annual Income:
+```{r}
+qplot(factor(0), annual_inc, data = data, geom="jitter") +
+  geom_hline(aes(yintercept=mean(data$annual_inc, na.rm=T)), col="Red") +
+  scale_y_log10(breaks = trans_breaks("log10", function(y) 10^y), 
+                labels = trans_format("log10", math_format(10^.x))) +
+  annotation_logticks(sides="l") + 
+  xlab("Red line is the mean") + 
+  theme(axis.ticks=element_blank(), axis.text.x=element_blank()) +
+  ylab("Log scale annual income") +
+  ggtitle("Annual income (Dollars)")
+```
+So I jittered the plot, and you can see that the average annual income is shy of 100,000--
+```{r}
+mean(data$annual_inc)
+summary(data$annual_inc)
+```
+The actual number is $75189.59, but surprisingly there is even someone whose income is declared as more than seven million dollars a year.
+```{r, fig.width=10}
+ggplot(data, aes(x=annual_inc)) + 
+  stat_bin(breaks=seq(0, 300000, by=25000)) +
+  # Ignoring the outliers making above 300000 a year
+  xlab("Annual income grouped by 25k") + 
+  ylab("Count") +
+  ggtitle("Another look at income") +
+  scale_x_continuous(breaks=seq(0,3000000, 25000))
+```
+From this, we can see that most people make between 50,000 and 75,000, with the second most making between 25,000 and 50,000 a year.
+Employment length:
+```{r}
+  ggplot(data, aes(factor(emp_length))) + 
+  geom_bar() + 
+  theme(axis.text.x=element_text(angle=45, hjust=1)) +
+  xlab("Employment length") +
+  ylab("People")
+```
+We can see most of the users of the site have been employed at least ten years--but we can also see that some of the values were not entered by those seeking loans (thus the NAs). Also of note is that if someone is unemployed, they are listed as less than one year.\newline
+Grade:
+```{r}
+ggplot(data,aes(factor(grade))) + 
+  geom_bar() +
+  xlab("Grade") +
+  ggtitle("Loan quality grade") +
+  ylab("People")
+```
+Most of the loans are rated as B and C loans\newline
+Home Ownership:
+```{r}
+ggplot(data, aes(factor(home_ownership))) +
+  geom_bar() + 
+  xlab("Home Ownership Status") +
+  ggtitle("Home ownership") + 
+  ylab("People")
+```
+Unsurprising that many of these people taking out loans have mortgages on their houses, or rent (as most people in general do something similar)\newline
+Loan Amount:
+```{r}
+ggplot(data, aes(x=factor(0), y=loan_amnt)) + 
+  geom_boxplot() + 
+  xlab("") + 
+  ylab("") +
+  ggtitle("Loan amount in Dollars") +
+  theme(axis.ticks=element_blank(), 
+        axis.text.x=element_blank())
+```
+
+```{r}
+mean(data$loan_amnt)
+summary(data$loan_amnt)
+```
+We can see that most of the loans are for $13,000 with an average just higher than that at 14,860. 
+```{r}
+nrow(filter(data, data$loan_amnt == 35000))
+nrow(filter(data, data$loan_amnt == 1000))
+```
+We can also see that it is likely that the minimum loan you can apply for is $1,000 and the maximum $35,000. It is unlikely that there are so many people requesting loans for those amounts and none interested in one higher or lower.
+Loan Status:
+```{r, fig.width=10}
+
+ggplot(data, aes(loan_status)) + 
+  geom_bar() +
+  xlab("Loan Status") +
+  ggtitle("Loan Status") + 
+  scale_y_log10(breaks = trans_breaks("log10", function(y) 10^y), 
+                labels = trans_format("log10", math_format(10^.x)))
+```
+As this is a log scale, we can see that far and away most of the loans are current, with less as fully paid, and fortunately, fewest are in default, a few more are "charged off" and there is not a huge difference (at least in a log scale) between those that are in the grace period, those that are only a few weeks late, and those that are a few months late.\newline\newline
+
+Now we can compare some of the variables:\newline
+
+Let's find out what annual income correlates with:\newline
+First, employment length:
+```{r, fig.width=10}
+ggplot(data, aes(x=emp_length, y=annual_inc)) + 
+  geom_boxplot() + 
+  scale_y_log10(breaks = trans_breaks("log10", function(y) 10^y), 
+                labels = trans_format("log10", math_format(10^.x))) +
+  xlab("Employment Length") +
+  ylab("Annual Income")
+```
+This is on a log scale: unsurprisingly, we can see that the longer someone is employed, the higher the average salary. Also unsurprisingly, those who did not list an occupation make less money than those who listed themselves as < 1 year. We can also see that the person who is paid the most and third most have been working in those positions for five years.\newline
+Now let's take a look at which states have the most total income per person:
+```{r, fig.height=8}
+state.mean.inc <- ddply(data, .(addr_state), summarise, state.mean = mean(annual_inc))
+# state.mean.inc$addr_state <- factor(state.mean.inc$addr_state, levels=rev(levels(state.mean.inc$addr_state)))
+ggplot(state.mean.inc, aes(x=addr_state, y=state.mean)) + 
+  geom_bar(stat="identity") + 
+  coord_flip() + 
+  ylab("Mean income") +
+  xlab("State") +
+  ggtitle("Mean income by state")
+```
+We can see that the mean income of those in Washington DC is the highest, while Iowa and Idaho are the lowest.
+```{r, fig.width=10}
+ggplot(data, aes(x=factor(loan_status), y=loan_amnt)) + 
+  geom_boxplot() +
+  xlab("Loan status") +
+  ylab("Loan amount") + 
+  ggtitle("Loan status compared to loan amount")
+```
+We can see, interestingly, that the average loan amount is lower for the loans in default than those that are current (and lower for 16-30 days late than either less or more). It may be safer to loan more money than less.
+```{r}
+ggplot(data, aes(x=factor(home_ownership), y=loan_amnt)) +
+  geom_boxplot() +
+  xlab("Home Ownership Status") +
+  ylab("Loan Amount") +
+  ggtitle("Loan amount and home ownership status")
+```
+We can see here that the biggest loans (on average) are asked for by those with mortgages on their houses, while those renting ask for the least.
