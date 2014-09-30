@@ -1,0 +1,73 @@
+---
+title: "Week 6 Assignment--IS 605"
+author: "Brett Burk"
+output: pdf_document
+---
+
+\noindent\textbf{1.1} There are $6^{3}$ or $216$ possible combinations.\newline
+\noindent\textbf{1.2} There are two combinations of two dice that produce a three $(1,2), (2,1)$ thus the probability is $\frac{2}{36}=\frac{1}{18}$.\newline
+\noindent\textbf{1.3} The probability that none are different is equal to $$\frac{365!}{365^{n}(365-n)!}$$ so subtracting that from 1 will give us the solution we are looking for, so with $n=25$ we have $$\frac{365!}{365^{25}(340)!}$$
+```{r}
+birthday.chance <- function(n){
+  return (1 - (prod(365:((365-n)+1))/(365^n)))
+}
+birthday.chance(25)
+birthday.chance(50)
+```
+We can see with only $25$ people, the chances are greater than half, and with $50$ people, the chance are greater than $97\%$ that two people will share a birthday.\newline
+\noindent\textbf{2}
+A function that returns the probabilities of any word occurring
+```{r}
+# setwd("C:\\Users\\Brett\\Dropbox\\CUNY\\605")
+file.name <- "assign6.sample.txt"
+calc.prob.words <- function(file){
+  # Uses readChar to load in the document
+  doc <- readChar(file, file.info(file)$size, useBytes=F)
+  # Encodes it, as otherwise I was having errors with apostrophes
+  Encoding(doc) <- "UTF-8"
+  # Splits on all non-word character
+  words.vec <- (strsplit(doc, "\\W"))[[1]]
+  # Removes the spaces that were not properly treated by regex
+  words.vec <- subset(words.vec, words.vec != "")
+  # Converts to lower
+  words.vec <- tolower(words.vec)
+  prob.words <- table(words.vec) / length(unique(words.vec))
+  # Returns the probability
+  return (prob.words)
+}
+calc.prob.words(file.name)
+```
+A function that returns the probabilities of any pair of words occurring (words like "I've" are treated as two words, "I" and "ve"
+```{r}
+calc.prob.pairs <- function(file){
+  # Same as the previous
+  doc <- readChar(file, file.info(file)$size, useBytes=F)
+  Encoding(doc) <- "UTF-8"
+  words.vec <- (strsplit(doc, "\\W"))[[1]]
+  words.vec <- subset(words.vec, words.vec != "")
+  words.vec <- tolower(words.vec)
+  # Creates a new vector to store the pairs
+  pairs.vec <- c()
+  # Iterates through and creates every possible pair of adjacent words
+  for (i in 1:(length(words.vec)-1)){
+    pairs.vec[i] <- paste(words.vec[i], words.vec[i+1], sep=" ")
+    }
+  # Alphebetizes so that "for what" and "what for" are both counted as "for what" so we can get an adjacency match
+  for (i in 1:(length(pairs.vec))){
+    temp <- sort(strsplit(pairs.vec[i], " ")[[1]])
+    pairs.vec[i] <- paste(temp[1], temp[2], sep=".")
+  }  
+  prob.pair <- table(pairs.vec) / length(unique(pairs.vec))
+  # Returns the probability
+  return (prob.pair)
+}
+calc.prob.pairs(file.name)
+```
+You could then of course find which have the best probabilities, and what the probabilities are:
+```{r}
+words.res <- calc.prob.words(file.name)
+words.res[which.max(words.res)]
+
+pairs.res <- calc.prob.pairs(file.name)
+pairs.res[which.max(pairs.res)]
+```
