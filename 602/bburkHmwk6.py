@@ -43,12 +43,19 @@ def searchWithoutLoops():
 
 # Numpy's search, which is pretty inefficient when you just want a T/F response, but much more effective if you're looking for more.
 def numpySearch():
+    return random.L in np.array(L)
+
+# A slightly slower search:
+def numpySearch2():
     return np.any(np.in1d(L, random.L))
 
 if __name__ == "__main__":
     import timeit as ti
+    print "Using ten iterations for each\n\n"
+    #print "Sort with loops: " + str(ti.timeit("sortWithLoops()", setup="from __main__ import sortWithLoops", number=10))
     print "Sort without loops: " + str(ti.timeit("sortWithoutLoops()", setup="from __main__ import sortWithoutLoops", number=10))
     print "Sort with numpy: " + str(ti.timeit("numpySort()", "from __main__ import numpySort", number=10))
     print "Search with loops: " + str(ti.timeit("searchWithLoops()", setup="from __main__ import searchWithLoops", number=10))
     print "Search without loops: " + str(ti.timeit("searchWithoutLoops()", setup="from __main__ import searchWithoutLoops", number=10))
     print "Search with numpy: " + str(ti.timeit("numpySearch()", setup="from __main__ import numpySearch", number=10))
+    print "Search with numpy2: " + str(ti.timeit("numpySearch2()", setup="from __main__ import numpySearch2", number=10))
