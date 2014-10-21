@@ -1,0 +1,40 @@
+---
+title: "Assignment 8"
+author: "Brett Burk"
+output: pdf_document
+---
+
+\textbf{1}
+$$Pr(A|B)=\frac{Pr(B|A)Pr(A)}{Pr(B)}$$ We know that $Pr(B) = \frac{(.9*10) + (.5*10)}{20} = \frac{14}{20} = 0.7$ and that $Pr(B|A) = 0.5$ and $Pr(A) = 0.5$ thus we have $$Pr(A|B) = \frac{0.5 * 0.5}{0.7} = \frac{0.25}{0.75} \sim 0.3571$$
+
+\textbf{2}
+```{r}
+library(gRain)
+# Setting the levels
+yn <- c("yes", "no")
+hl <- c("high", "low")
+# Using each as a percent (although, for example i could have values of 1,4) for clarity
+d <- cptable(~difficulty, values=c(70, 30), levels=yn)
+i <- cptable(~intelligence, values=c(20, 80), levels=hl)
+g.id <- cptable(~grade|intelligence:difficulty, values=c(90, 10, 99, 1, 20, 80, 40, 60), levels=hl)
+s.i <- cptable(~sat|intelligence, values=c(80, 20, 10, 90), levels=hl)
+l.g <- cptable(~letter|grade, values=c(95, 5, 10, 90), levels=hl)
+# Compiling
+plist <- compileCPT(list(d, i, g.id, s.i, l.g))
+# Creating the Bayesian Network
+baynet <- grain(plist)
+# Querying the network,but plist$difficulty better matches up with latter columns, so I'll leave that one
+#querygrain(baynet, nodes=c("letter", "difficulty"), result="data.frame")$difficulty
+plist$difficulty
+```
+That was the initial probability
+```{r}
+baynetLH <- setFinding(baynet, nodes="letter", states="high")
+querygrain(baynetLH, nodes=c("letter", "difficulty"))$difficulty
+```
+We can see that it is more likely that a course was difficult given that a high recommendation letter was given. $(0.84 > 0.7)$
+```{r}
+baynetLHSH <- setFinding(baynet, nodes=c("sat", "letter"), states=c("high", "high"))
+querygrain(baynetLHSH, nodes=c("letter", "sat", "difficulty"), type="marginal")$difficulty
+```
+It is only slightly more likely that a course was difficult given a high sat score and a high recommendation, than just a high recommendation alone. (0.86 > 0.84)

@@ -1,0 +1,65 @@
+---
+title: "BBurk_Assign7"
+output: pdf_document
+---
+First I'll initialize the running average with some numbers and their count (n=1)
+```{r}
+first.calc <- function(curr){
+  # For use lateR:
+  curr.num <- length(starting.values)
+  # Easy mean calculation
+  curr.mean <- 1/curr.num * sum(curr)
+  # Easy variance calculation
+  curr.var <- (sqrt(1/curr.num * sum((curr - curr.mean)^2))^2)
+  # Storying them all as one:
+  curr <- c(curr.mean, curr.var, curr.num)
+  names(curr) <- c("mean", "variance", "length")
+  return(curr)
+}
+starting.values <- c(1:10)
+curr <- first.calc(starting.values)
+curr
+```
+Next, we'll create the function that will find the new mean, taking as input the current mean, the current count, and a list of additional numbers (that can be any length)
+```{r}
+calc.mean.var <- function(curr, b){
+  # a is the old mean
+  a <- curr["mean"]
+  # v is the variance of the old list
+  v <- curr["variance"]
+  # n is the length of the old list
+  n <- curr["length"]
+  # Length of the new combined list:
+  new.n <- n + 1
+  
+  # Calculate the mean by weighting the old mean and the new number proportionally
+  ab.mean <- ((a * (n / new.n)) + ((1 / new.n) * b))
+  # Now that I have the new mean, I can calculate the standard deviation, by 
+  # weighting the old and new in the same was as the mean and finding the new 
+  # by multiplying the difference between the new number and the old mean and the 
+  # new number and the new mean
+  ab.var <-  (v * (n / new.n)) + ((1 / new.n) * ((b - a) * (b - ab.mean)))
+  out <- c(ab.mean, ab.var, new.n)
+  #names(out) <- c("mean", "variance", "length")
+  return(out)
+}
+# This can be set to anything to confirm the function
+incoming.number <- 44
+# This could be set to recalculate any time a new number comes into the system:
+curr <- calc.mean.var(curr, incoming.number)
+mine <- curr
+mine
+```
+Now to check those against R's values:
+```{r}
+new.l <- c(starting.values, incoming.number)
+r.mean <- mean(new.l)
+# Again, finding the population variance, as opposed to the sample 
+# (as sd() does by default in R)
+r.var <- (sd(new.l) * sqrt((length(new.l) - 1)/length(new.l)))^2
+r.length <- length(new.l)
+rs <- c(r.mean, r.var, r.length)
+names(rs) <- c("mean", "variance", "length")
+rs
+all.equal(mine, rs)
+```
