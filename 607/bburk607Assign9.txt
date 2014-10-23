@@ -1,5 +1,5 @@
 mongoimport --db unitedstates --collection unitedstates --headerline --type csv --file C:\Users\Brett\Documents\Data\statedata.csv
 
->mongoimport --db unitedstates --collection unitedstates --headerline --type tsv --file C:\Users\Brett\Documents\Data\inhabitedterritorydata.txt
+mongoimport --db unitedstates --collection unitedstates --headerline --type tsv --file C:\Users\Brett\Documents\Data\inhabitedterritorydata.txt
 
 mongoimport --db unitedstates --collection unitedstates --headerline --type tsv --file C:\Users\Brett\Documents\Data\districtdata.txt
