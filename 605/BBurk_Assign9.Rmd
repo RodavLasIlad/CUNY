@@ -1,0 +1,88 @@
+---
+title: "Assignment 9"
+authoer: "Brett Burk"
+output: pdf_document
+---
+\textbf{Problem 1}
+$$f(x) = \begin{cases}
+  x & \text{if } 0 \leq x \leq 1 \\
+  2-x & \text{if } 1 \leq x \leq 2
+  \end{cases}
+$$
+```{r}
+fun1 <- function(x) { 
+  if (x >= 0 && x <= 1) {
+    return(x)
+  } else if (x > 1 && x <= 2) {
+    return(2-x)
+  }
+}
+```
+\textbf{Problem 2}
+$$f(x) = \begin{cases}
+  1-x & \text{if } 0 \leq x \leq 1 \\
+  x-1 & \text{if } 1 \leq x \leq 2
+  \end{cases}
+$$
+```{r}
+fun2 <- function(x) { 
+  if (x >= 0 && x <= 1) {
+    return(1-x)
+  } else if (x > 1 && x <= 2) {
+    return(x-1)
+  }
+}
+```
+##### Problem 3 #####
+\textbf{Problem 3}
+1000 samples using each pdf
+```{r}
+sample1 <- sample(
+  seq(0,2, by=0.01), 1000, replace=T, 
+  prob=sapply(
+    seq(0,2,by=0.01), 
+    function(x) fun1(x)
+  )
+)
+
+sample2 <- sample(
+  seq(0,2, by=0.01), 1000, replace=T, 
+  prob=sapply(
+    seq(0,2,by=0.01), 
+    function(x) fun2(x)
+  )
+)
+```
+Graphing them:
+```{r}
+hist(sample1, 30, freq=F)
+hist(sample2, 30, freq=F)
+```
+\textbf{Problem 4}
+```{r}
+createPDF <- function(n, pdf) {
+  nx <- sample(seq(0,2, by=0.01), n, replace=T,
+               prob = sapply(
+                 seq(0,2,by=0.01),
+                 function(x) {
+                   pdf(x)}))
+  hist(nx, 30, freq=F)
+  print(paste("The sample mean for", n, "samples from the pdf is", mean(nx)))
+}
+```
+Using fun1 as an example:
+```{r}
+createPDF(10000, fun1)
+createPDF(1000, fun1)
+createPDF(20, fun1)
+createPDF(10, fun1)
+```
+Using fun2 as an example:
+```{r}
+createPDF(10000, fun2)
+createPDF(1000, fun2)
+createPDF(20, fun2)
+createPDF(10, fun2)
+```
+
+Thus we can see that the Central Limit Theorem holds
