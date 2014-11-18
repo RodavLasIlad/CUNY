@@ -105,10 +105,6 @@ for i in range(len(epa)):
    epa['date'][i] = epa['date'][i][1:-1]
    tmp = epa['date'][i].split(':')
    epa['date'][i] = tmp[0] + tmp[1]
-# While I could have parsed this to datetime, using pd.to_datetime() it would have been completely redundant considering there are only 2 days, and thus only two copies of each hour,
-   # especially given the format the data came in, which would have taken as much processing to get it into pandas format, before talking about using .hour to groupby
-
-# Dropping the altgif rows, as they don't contribute any information and are erroneus (is it supposed to be alt.gif=" ? likely there is supposed to be more information there)
 
 bH = epa['date'].value_counts()
 bHi = []
